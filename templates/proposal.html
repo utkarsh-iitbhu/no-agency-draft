@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Project Proposal</title>
+    <!-- Include MathJax for LaTeX rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Include Markdown-it for markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+</head>
+<body>
+    <h1>Project Proposal</h1>
+    <div id="proposal-content"></div>
+
+    <script>
+        // Initialize markdown-it
+        var md = window.markdownit();
+
+        // Convert the proposal to HTML and render it
+        var proposalContent = md.render(`{{ proposal }}`);
+
+        // Insert the rendered content into the div
+        document.getElementById('proposal-content').innerHTML = proposalContent;
+
+        // Trigger MathJax to process the content for LaTeX
+        MathJax.typeset();
+    </script>
+</body>
+</html>

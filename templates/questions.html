@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Additional Questions</h1>
+    <form method="POST" action="/submit_answers">
+        {% for key, question in questions_dict.items() %}
+            <p>{{ key }}</p>
+            <input type="text" name="{{ key }}" required><br>
+        {% endfor %}
+        <!-- Include the extracted_info as a hidden input -->
+        <input type="hidden" name="extracted_info" value="{{ extracted_info }}">
+        <input type="submit" value="Submit Answers">
+    </form>
+</body>
+</html>

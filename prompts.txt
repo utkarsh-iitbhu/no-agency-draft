@@ -1,0 +1,10 @@
+I want to create a website which converts text documents to pdf and it shall have features like merging pdf, editing pdf, removing watermarks and some related features. Major competitors are sejda.com and ilovepdf.com site. 
+Budget is 50,000 INR 
+
+I want to a hyper local supermarket place for medical-healthcare industry. Create a website which deals with buying medicines, booking doctor appointments. It should have authentication for users and a an authentication for providers where they can put up there products, shopping cart, secure payments, reviews, blogs, doctor scheduling. I need suggestion for technology stack and features based on competitors Competitors are 1mg: https://www.1mg.com/ PharmEasy: https://pharmeasy.in/
+
+I want to build an eco-friendly e-commerce website with a clean design focused on green and earthy tones. It should have user accounts, a shopping cart, secure payments, product reviews, and a blog. I need suggestions for technology stack and features based on competitors.
+Competitors include EcoWare (https://www.ecoware.com) and Green and Life (https://www.greenandlife.com).
+My budget is 1,00,00 INR and I want to finish my project in 2 months.
+
+I want to create a coding platform where I can put questions and topics regarding Data science and ML. I want to add features like learning paths, retention learning, quizzes, hackathons. 
