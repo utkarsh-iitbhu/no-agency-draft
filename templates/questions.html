@@ -1,11 +1,31 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Additional Questions</title>
+    <style>
+        .question-container {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
 <body>
     <h1>Additional Questions</h1>
     <form method="POST" action="/submit_answers">
         {% for key, question in questions_dict.items() %}
-            <p>{{ key }}</p>
-            <input type="text" name="{{ key }}" required><br>
+            <div class="question-container">
+                <p>{{ key }}</p>
+                {% if "timeline" in key.lower() %}
+                    <select name="{{ key }}" required>
+                        <option value="">Select timeline</option>
+                        <option value="7-15 days">7-15 days</option>
+                        <option value="15-30 days">15-30 days</option>
+                        <option value="30-45 days">30-45 days</option>
+                        <option value="45+ days">45+ days</option>
+                    </select>
+                {% else %}
+                    <input type="text" name="{{ key }}" required>
+                {% endif %}
+            </div>
         {% endfor %}
         <!-- Include the extracted_info as a hidden input -->
         <input type="hidden" name="extracted_info" value="{{ extracted_info }}">

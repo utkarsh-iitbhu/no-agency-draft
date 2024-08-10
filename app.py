@@ -64,7 +64,7 @@ def create_extraction_chain():
       "What are the features to add in the project?": "...",
       "Are there any competitors for the idea?": "...",
       "What is the expected timeline to complete the project?": "...",
-      "What is the budget in mind for this project?": "..."
+      "What is the budget in mind for this project?": "..."      
     }}
     """
     prompt = ChatPromptTemplate.from_messages([HumanMessagePromptTemplate.from_template(template)])
@@ -90,7 +90,7 @@ def create_proposal_chain():
     {all_info}
 
     Using the provided user input and your expertise in software development and project management, create an extensive project proposal. Follow the structure below, ensuring each section is thoroughly addressed with specific details, examples, and justifications where applicable.
-    Also try to fit proposal with given user input, try to allign with the time and budget given. Make sure you try to get the currency from the prompt, if unable to fetch then use USD dollars You can deviate a bit from the given time and budget. 
+    Also try to fit proposal with given user input, try to allign with the time and budget given. Make sure you try to get the currency from the prompt, if unable to fetch then use INR Indian Rupees. You can deviate a bit from the given time and budget. 
     If you feel like time and budget is not enough, you can add more details to the proposal. 
     You can add details about what should be expected number of people to hire for the alloted budget and time constraints.
     
@@ -107,19 +107,17 @@ def create_proposal_chain():
     - Potential alternatives and why they were not selected
 
     4. Technology Tags
-    Select 5-10 most relevant tags from the provided list. For each tag, briefly explain its relevance to the project.
+    Select 5-10 most relevant tags from the provided list. Dont select the same tag twice and don't select tags that are not relevant to the project. For each tag, briefly explain its relevance to the project.
     Available Tags: {all_tags}
 
     5. Competitors Analysis
-    Conduct an in-depth analysis of at least 3 competitors, including:
+    Conduct an in-depth analysis of at least 2-3 competitors, including:
     - Overview of each competitor's offering
     - Their strengths and weaknesses
     - Unique features or approaches
-    - Market positioning
-    - How the proposed project will differentiate itself and gain a competitive advantage
-
+        
     6. Major Features
-    Detail at least 3-5 key features of the project. For each feature:
+    Detail at least 3-5 key features of the project. For each feature use alphabest for new points:
     - Provide a clear description
     - Explain its importance and value to the end-user
     - Outline any technical challenges in implementation
@@ -127,64 +125,36 @@ def create_proposal_chain():
 
     7. Time Breakdown for Different Components
     Create a comprehensive breakdown of the project timeline, including:
+    Use the information provided in the expected timeline to complete the project and distribute the time accordingly. 
+    If you find the information in the expected timeline not enough, provide a rough estimate of the time required for each component. But try to stick to the timeline provided in the prompt.
     - Planning and requirement gathering
     - Design phase (UI/UX, system architecture)
     - Development of each major feature
-    - Testing phases (unit testing, integration testing, user acceptance testing)
     - Deployment and launch preparations
     Provide time estimates for each component in weeks or days.
 
     8. Total Time Calculation
     Sum up the time estimates from the previous section and provide:
-    - Total project duration in weeks/months
-    - Potential factors that could impact the timeline
-    - Suggestions for optimizing the schedule if needed
-
+    - Total project duration in days/weeks/months
+    
     9. Resource Allocation
     Specify the number and types of resources needed, including:
-    - Detailed roles (e.g., frontend developer, backend developer, UI/UX designer, project manager, QA specialist)
     - Number of resources for each role
-    - Required skills and experience level for each role
     - Suggested team structure and reporting lines
 
-    10. Budget Estimation
-        Provide a detailed budget breakdown, including:
-        - Cost estimates for each resource type
-        - Software licenses and tools
-        - Infrastructure and hosting costs
-        Present the budget in the currency which is provided by the user if not then use USD equivalent.
-
-    11. Detailed Project Milestones
+    
+    10. Detailed Project Milestones
         Outline at least 5-7 major milestones for the project. For each milestone:
         - Provide a clear description of the deliverables
         - Set specific and measurable success criteria
         - Estimate the completion date
         
-    12. Project Timeline and Resource Allocation
+    11. Project Timeline and Resource Allocation
         Create a comprehensive project timeline that includes:
         - Key phases and milestones
         - Resource allocation throughout the project lifecycle
         - Critical path and potential bottlenecks
-        - Strategies for handling delays or unexpected challenges
-
-    13. Risk Assessment and Mitigation Strategies
-        Identify at least 2-3 potential risks to the project and for each:
-        - Describe the risk and its potential impact
-        - Assess the likelihood of occurrence
-        
-    14. Quality Assurance and Testing Strategy
-        Outline a comprehensive QA and testing approach, including:
-        - Types of testing to be performed (e.g., unit, integration, system, user acceptance)
-        - Testing tools and methodologies
-        - Key performance indicators and acceptance criteria
-        - Plan for handling bug fixes and retesting
-
-    15. Post-Launch Support and Maintenance
-        Describe the plan for supporting and maintaining the project after launch, including:
-        - Duration of initial support period
-        - Types of support provided (e.g., bug fixes, minor enhancements, user support)
-        - Strategy for gathering and incorporating user feedback
-
+    Add a conclusion at the end of the project proposal.
     Ensure that each section is addressed in detail, providing specific examples, numerical data, and justifications where applicable. The response should be comprehensive, demonstrating deep understanding of the project requirements and software development best practices.
     """
     prompt = ChatPromptTemplate.from_messages([HumanMessagePromptTemplate.from_template(template)])
@@ -260,6 +230,10 @@ def index():
         question_chain = create_question_chain()
         questions_dict = generate_questions(question_chain, extracted_info)
         # print(questions_dict) # Uncomment this code to check for questions if hallucinating
+        for key, question in questions_dict.items():
+            if "timeline" in str(question).lower() or "expected time" in str(question).lower():
+                questions_dict[key] = "What is the expected timeline to complete the project?"
+        
         if "No additional questions needed." in questions_dict.values():
             proposal_chain = create_proposal_chain()
             proposal = generate_proposal(proposal_chain, extracted_info)
@@ -310,7 +284,7 @@ def submit_answers():
     """
     answers = request.form.to_dict()
     _ , extracted_info = generate_questionnaire(answers)
-    
+    # print("Extracted info: ",extracted_info) # Check the final extracted info
     proposal_chain = create_proposal_chain()
     proposal = generate_proposal(proposal_chain, extracted_info)
     return render_template('proposal.html', proposal=proposal)
