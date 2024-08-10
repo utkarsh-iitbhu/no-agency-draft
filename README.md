@@ -11,8 +11,8 @@ This application generates detailed project proposals based on user input using 
 
 1. Clone the repository:
 ```
-git clone https://github.com/yourusername/project-proposal-generator.git
-cd project-proposal-generator
+git clone https://github.com/utkarsh-iitbhu/no-agency-draft.git
+cd no-agency-draft
 ```
 
 2. Create a virtual environment:
