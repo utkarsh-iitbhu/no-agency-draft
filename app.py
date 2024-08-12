@@ -116,11 +116,11 @@ def create_proposal_chain():
     - Their strengths and weaknesses
     - Unique features or approaches
         
-    6. Major Features
-    Detail at least 3-5 key features of the project. For each feature use alphabest for new points:
-    - Provide a clear description
-    - Explain its importance and value to the end-user
-    - Outline any technical challenges in implementation
+    6. Major Features: This is the important section, which requires more attention while answering
+    Detail at least 5-7 key features of the project. For each feature use alphabest for new points:
+    - Provide a clear description and specify which technology or framework it is used for
+    - Explain its importance and value to the end-user, also specify if it is a critical feature
+    - Give details of feature implementation
     - Suggest potential enhancements or future iterations
 
     7. Time Breakdown for Different Components
@@ -186,14 +186,24 @@ def generate_questions(chain, extracted_info):
         extracted_info (dict): The extracted information to generate questions from.
 
     Returns:
-        list: A list of questions in JSON format.
+        dict: A dictionary of questions or a string indicating no additional questions are needed.
     """
-    questions_json =  chain.run(extracted_info= json.dumps(extracted_info, indent=2))
+    questions_json = chain.run(extracted_info=json.dumps(extracted_info, indent=2))
     start_index = questions_json.find('{')
     end_index = questions_json.rfind('}')
+    
+    if start_index == -1 or end_index == -1:
+        # If no JSON object is found, assume no additional questions are needed
+        return {"result": "No additional questions needed."}
+    
     questions_json = questions_json[start_index:end_index+1]
-    return json.loads(questions_json)
-
+    questions_dict = json.loads(questions_json)
+    
+    # Check if any questions were generated
+    if all(value is None for value in questions_dict.values()):
+        return {"result": "No additional questions needed."}
+    
+    return questions_dict
 def generate_proposal(chain, all_info):
     """
     Generates a proposal using the given chain and information.
@@ -227,14 +237,12 @@ def index():
         user_input = request.form['user_input']
         extraction_chain = create_extraction_chain()
         extracted_info = extract_information(extraction_chain, user_input)
+        # print("Extracted : ", extracted_info)
         question_chain = create_question_chain()
         questions_dict = generate_questions(question_chain, extracted_info)
-        # print(questions_dict) # Uncomment this code to check for questions if hallucinating
-        for key, question in questions_dict.items():
-            if "timeline" in str(question).lower() or "expected time" in str(question).lower():
-                questions_dict[key] = "What is the expected timeline to complete the project?"
-        
-        if "No additional questions needed." in questions_dict.values():
+        # print("Question : ", questions_dict)
+
+        if "result" in questions_dict and questions_dict["result"] == "No additional questions needed.":
             proposal_chain = create_proposal_chain()
             proposal = generate_proposal(proposal_chain, extracted_info)
             return render_template('proposal.html', proposal=proposal)

@@ -8,3 +8,15 @@ Competitors include EcoWare (https://www.ecoware.com) and Green and Life (https:
 My budget is 1,00,00 INR and I want to finish my project in 2 months.
 
 I want to create a coding platform where I can put questions and topics regarding Data science and ML. I want to add features like learning paths, retention learning, quizzes, hackathons. 
+
+Tags: 
+Product Growth
+End-to-end Developement
+Re-plateforming
+MVP
+API-Integration 
+AI + Machine Learning
+Rapid Prototyping
+Wireframing + UX 
+Data Science Solutions
+
