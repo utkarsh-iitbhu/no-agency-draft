@@ -89,8 +89,9 @@ def create_proposal_chain():
     Create a highly detailed and comprehensive project proposal based on the following information:
     {all_info}
 
-    Using the provided user input and your expertise in software development and project management, create an extensive project proposal. Follow the structure below, ensuring each section is thoroughly addressed with specific details, examples, and justifications where applicable.
-    Also try to fit proposal with given user input, try to allign with the time and budget given. Make sure you try to get the currency from the prompt, if unable to fetch then use INR Indian Rupees. You can deviate a bit from the given time and budget. 
+    Using the provided user input and your expertise in software development and project management, create an extensive project proposal. 
+    Follow the structure below, ensuring each section is thoroughly addressed with specific details, examples, and justifications where applicable.
+    The features provided by the user are basic so you have to add new complex and multipurpose features which can be around the project 
     If you feel like time and budget is not enough, you can add more details to the proposal. 
     You can add details about what should be expected number of people to hire for the alloted budget and time constraints.
     
@@ -110,50 +111,42 @@ def create_proposal_chain():
     Select 5-10 most relevant tags from the provided list. Dont select the same tag twice and don't select tags that are not relevant to the project. For each tag, briefly explain its relevance to the project.
     Available Tags: {all_tags}
 
-    5. Competitors Analysis
-    Conduct an in-depth analysis of at least 2-3 competitors, including:
-    - Overview of each competitor's offering
-    - Their strengths and weaknesses
-    - Unique features or approaches
-        
-    6. Major Features: This is the important section, which requires more attention while answering
-    Detail at least 5-7 key features of the project. For each feature use alphabest for new points:
-    - Provide a clear description and specify which technology or framework it is used for
-    - Explain its importance and value to the end-user, also specify if it is a critical feature
-    - Give details of feature implementation
-    - Suggest potential enhancements or future iterations
+    6. Major Features and Sub-Features:
 
-    7. Time Breakdown for Different Components
-    Create a comprehensive breakdown of the project timeline, including:
-    Use the information provided in the expected timeline to complete the project and distribute the time accordingly. 
-    If you find the information in the expected timeline not enough, provide a rough estimate of the time required for each component. But try to stick to the timeline provided in the prompt.
-    - Planning and requirement gathering
-    - Design phase (UI/UX, system architecture)
-    - Development of each major feature
-    - Deployment and launch preparations
-    Provide time estimates for each component in weeks or days.
+    Provide a comprehensive breakdown of at least 10-12 key features for the project apart from the features provided by the user including both common and advanced features relevant to the user's requirements. Present the information in a structured, tabular format as shown below:
+    Also provide 4-5 sub-features for each category of main feature.
 
-    8. Total Time Calculation
-    Sum up the time estimates from the previous section and provide:
-    - Total project duration in days/weeks/months
+    Main Feature | Sub-Features | Description | Complexity | Frontend Time (hours) | Backend Time (hours) | User Value
+    -------------|--------------|-------------|------------|----------------------|----------------------|------------
+    [Feature 1]  | - Sub-feature 1 | [Brief description] | [Low/Medium/High] | [UI: X, Integration: Y] | [Easy: A, Medium: B, High: C] | [Importance to user]
+                 | - Sub-feature 2 | [Brief description] | [Low/Medium/High] | [UI: X, Integration: Y] | [Easy: A, Medium: B, High: C] | [Importance to user]
+                 | - Sub-feature 3 | [Brief description] | [Low/Medium/High] | [UI: X, Integration: Y] | [Easy: A, Medium: B, High: C] | [Importance to user]
+    [Feature 2]  | - Sub-feature 1 | [Brief description] | [Low/Medium/High] | [UI: X, Integration: Y] | [Easy: A, Medium: B, High: C] | [Importance to user]
+                 | - Sub-feature 2 | [Brief description] | [Low/Medium/High] | [UI: X, Integration: Y] | [Easy: A, Medium: B, High: C] | [Importance to user]
+
+    Guidelines:
+    1. Ensure a mix of common, necessary features and advanced, innovative features that align with the project's goals.
+    2. For each main feature, provide 3-4 related sub-features that enhance its functionality.
+    3. Include at least 5 complex, high-value features that demonstrate deep understanding of the project domain.
+    4. For complex features, provide detailed descriptions of their implementation and value to the user.
+    5. Consider scalability, performance, and user experience when suggesting features.
+    6. Align features with the latest industry trends and best practices in the project's domain.
+    7. For each feature, specify technologies or frameworks that would be best suited for implementation.
+
+    Remember to tailor the features to the specific project requirements provided by the user, ensuring relevance and innovation in your suggestions.
+
+    Ensure that each feature and sub-feature is thoroughly described, with attention to development time estimates, technical implementation details, and user value. Consider the project's scope, complexity, and potential scalability needs when detailing these features.
     
-    9. Resource Allocation
-    Specify the number and types of resources needed, including:
-    - Number of resources for each role
-    - Suggested team structure and reporting lines
+    Example: 
+    Main Feature | Sub-Feature | Frontend UI (hours) | Frontend Integration (hours) | Customization (%) | Backend Easy (hours) | Backend Medium (hours) | Backend High (hours) | Category
+    -------------|-------------|---------------------|------------------------------|-------------------|----------------------|------------------------|----------------------|----------
+    Product catalog page | Numeric pagination | 2 | 1 | 2 | 3 | 5 | 9 | E-Commerce
+    Product catalog page | Card component | 0 | 1.5 | 2 | 0 | 0 | 0 | E-Commerce
+    Product catalog page | Infinite scrolling | 0 | 1 | 2 | 0 | 0 | 0 | E-Commerce
+    Product detail  page | Report or like review | 0 | 0.5 | 2 | 0 | 0 | 0 | E-Commerce
 
-    
-    10. Detailed Project Milestones
-        Outline at least 5-7 major milestones for the project. For each milestone:
-        - Provide a clear description of the deliverables
-        - Set specific and measurable success criteria
-        - Estimate the completion date
-        
-    11. Project Timeline and Resource Allocation
-        Create a comprehensive project timeline that includes:
-        - Key phases and milestones
-        - Resource allocation throughout the project lifecycle
-        - Critical path and potential bottlenecks
+    Ensure that your response maintains this tabular format and includes all the specified columns. Provide realistic time estimates and customization percentages based on the complexity of each feature and sub-feature.
+
     Add a conclusion at the end of the project proposal.
     Ensure that each section is addressed in detail, providing specific examples, numerical data, and justifications where applicable. The response should be comprehensive, demonstrating deep understanding of the project requirements and software development best practices.
     """

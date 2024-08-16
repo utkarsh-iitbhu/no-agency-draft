@@ -20,3 +20,50 @@ Rapid Prototyping
 Wireframing + UX 
 Data Science Solutions
 
+
+Prompt: 
+
+    5. Competitors Analysis
+    Conduct an in-depth analysis of at least 2-3 competitors, including:
+    - Overview of each competitor's offering
+    - Their strengths and weaknesses
+    - Unique features or approaches
+
+    6. Major Features: This is the important section, which requires more attention while answering
+    Detail at least 5-7 key features of the project. For each feature use alphabest for new points:
+    - Provide a clear description and specify which technology or framework it is used for
+    - Explain its importance and value to the end-user, also specify if it is a critical feature
+    - Give details of feature implementation
+    - Suggest potential enhancements or future iterations
+
+    7. Time Breakdown for Different Components
+    Create a comprehensive breakdown of the project timeline, including:
+    Use the information provided in the expected timeline to complete the project and distribute the time accordingly. 
+    If you find the information in the expected timeline not enough, provide a rough estimate of the time required for each component. But try to stick to the timeline provided in the prompt.
+    - Planning and requirement gathering
+    - Design phase (UI/UX, system architecture)
+    - Development of each major feature
+    - Deployment and launch preparations
+    Provide time estimates for each component in weeks or days.
+
+    8. Total Time Calculation
+    Sum up the time estimates from the previous section and provide:
+    - Total project duration in days/weeks/months
+    
+    9. Resource Allocation
+    Specify the number and types of resources needed, including:
+    - Number of resources for each role
+    - Suggested team structure and reporting lines
+
+    
+    10. Detailed Project Milestones
+        Outline at least 5-7 major milestones for the project. For each milestone:
+        - Provide a clear description of the deliverables
+        - Set specific and measurable success criteria
+        - Estimate the completion date
+        
+    11. Project Timeline and Resource Allocation
+        Create a comprehensive project timeline that includes:
+        - Key phases and milestones
+        - Resource allocation throughout the project lifecycle
+        - Critical path and potential bottlenecks
