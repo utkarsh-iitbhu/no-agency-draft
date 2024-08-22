@@ -4,7 +4,8 @@ import warnings
 warnings.filterwarnings('ignore')
 from dotenv import load_dotenv
 from langchain import LLMChain
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template,  redirect, url_for,  jsonify
+from langchain_core.output_parsers import JsonOutputParser
 from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 import google.generativeai as genai
@@ -51,14 +52,17 @@ def create_extraction_chain():
 
     1. What is the project to build?
     2. What are the features to add in the project?
+    3. What are the additional features that you want to add?
     
     User Input: {user_input}
 
     Provide the output in JSON format without any markdown formatting.
+    Answer for finding the features should be comma separated and it should be 2-3 words for individual features
     Output should look like this:
     {{
       "What is the project to build?": "...",
       "What are the features to add in the project?": "...",
+      "What are the additional features that you want to add?":"Not provided",
     }}
     """
     prompt = ChatPromptTemplate.from_messages([HumanMessagePromptTemplate.from_template(template)])
@@ -71,11 +75,22 @@ def create_question_chain():
     {extracted_info}
 
     Generate questions only for items marked as "Not provided" or if more clarification is needed.
+    If the "What are the additional features that you want to add?" field is marked as "Not provided", provide a list of potential additional features that could be relevant based on the provided project details.
+    The list should be in the following format:
+
+    "What additional features would you like to add?":
+    - Feature 1
+    - Feature 2
+    - Feature 3
+    - Feature 4
+    - Feature 5
+
     If all information is provided, respond with "No additional questions needed."
 
-    Provide the output output in JSON format without any markdown formatting.
+    Output in JSON format without any markdown formatting.
     """
-    prompt = ChatPromptTemplate.from_messages([HumanMessagePromptTemplate.from_template(template)])
+    output_parser = JsonOutputParser()
+    prompt = ChatPromptTemplate.from_messages([HumanMessagePromptTemplate.from_template(template, output_parser=output_parser)])
     return LLMChain(llm=llm, prompt=prompt)
 
 def create_proposal_chain():
@@ -149,14 +164,13 @@ def create_proposal_chain():
     - Frontend Development: [X] hours
     - Backend Development: [X] hours
     - Database Design and Implementation: [X] hours
-    - API Integration: [X] hours
-    - Server Setup and Configuration: [X] hours
     - Continuous Integration/Continuous Deployment Setup: [X] hours
  
     Total Estimated Timeline: [Sum of all hours(show the timeline in days/weeks/months)] INR (average employee works for 8 hours a day)
-
+    Don't provide any conclusion. 
     """
-    prompt = ChatPromptTemplate.from_messages([HumanMessagePromptTemplate.from_template(template)])
+    output_parser = JsonOutputParser()
+    prompt = ChatPromptTemplate.from_messages([HumanMessagePromptTemplate.from_template(template, output_parser=output_parser)])
     return LLMChain(llm=llm, prompt=prompt)
 
 def extract_information(chain, user_input):
@@ -187,20 +201,22 @@ def generate_questions(chain, extracted_info):
     Returns:
         dict: A dictionary of questions or a string indicating no additional questions are needed.
     """
-    questions_json = chain.run(extracted_info=json.dumps(extracted_info, indent=2))
-    start_index = questions_json.find('{')
-    end_index = questions_json.rfind('}')
+    questions_json = chain.run(extracted_info=extracted_info)
+    questions_dict = questions_json
+    # questions_json = chain.run(extracted_info=json.dumps(extracted_info, indent=2))
+    # start_index = questions_json.find('{')
+    # end_index = questions_json.rfind('}')
     
-    if start_index == -1 or end_index == -1:
-        # If no JSON object is found, generate questions for missing information
-        return generate_questions_for_missing_info(extracted_info)
+    # if start_index == -1 or end_index == -1:
+    #     # If no JSON object is found, generate questions for missing information
+    #     return generate_questions_for_missing_info(extracted_info)
     
-    questions_json = questions_json[start_index:end_index+1]
-    questions_dict = json.loads(questions_json)
+    # questions_json = questions_json[start_index:end_index+1]
+    # questions_dict = json.loads(questions_json)
     
-    # Check if any questions were generated
-    if all(value is None for value in questions_dict.values()):
-        return generate_questions_for_missing_info(extracted_info)
+    # # Check if any questions were generated
+    # if all(value is None for value in questions_dict.values()):
+    #     return generate_questions_for_missing_info(extracted_info)
     
     return questions_dict
 
@@ -231,7 +247,58 @@ def generate_proposal(chain, all_info):
     Returns:
         object: The generated proposal.
     """
-    return chain.run(all_info=all_info, all_tags=all_tags)
+    proposal_json = chain.run(all_info=all_info, all_tags=all_tags)
+    return proposal_json
+    # return chain.run(all_info=all_info, all_tags=all_tags)
+
+@app.route('/api/extract', methods=['POST'])
+def api_extract():
+    '''
+    {
+    "user_input": "I want to a hyper local supermarket place for medical-healthcare industry. Create a website which deals with buying medicines, booking doctor appointments. It should have authentication for users and a an authentication for providers where they can put up there products, shopping cart, secure payments, reviews, blogs, doctor scheduling."
+    }
+    '''
+    data = request.json
+    user_input = data.get('user_input', '')
+    extraction_chain = create_extraction_chain()
+    extracted_info = extract_information(extraction_chain, user_input)
+    return jsonify(extracted_info)
+
+@app.route('/api/generate_questions', methods=['POST'])
+def api_generate_questions():
+    '''
+    {
+    "extracted_info": {
+        "What is the project to build?": "web app",
+        "What are the features to add in the project?": "authentication, dashboard",
+        "What are the additional features that you want to add?": "Not provided"
+    }
+    }
+
+    '''
+    data = request.json
+    extracted_info = data.get('extracted_info', {})
+    question_chain = create_question_chain()
+    questions_dict = generate_questions(question_chain, extracted_info)
+    return jsonify(questions_dict)
+
+@app.route('/api/generate_proposal', methods=['POST'])
+def api_generate_proposal():
+    '''
+    {
+    "all_info": {
+        "What is the project to build?": "web app",
+        "What are the features to add in the project?": "authentication, dashboard",
+        "What are the additional features that you want to add?": "notifications, analytics"
+    }
+    }
+
+    '''
+    data = request.json
+    all_info = data.get('all_info', {})
+    proposal_chain = create_proposal_chain()
+    proposal = generate_proposal(proposal_chain, all_info)
+    return jsonify(proposal)
 
 # Flask routes
 @app.route('/', methods=['GET', 'POST'])
@@ -249,22 +316,28 @@ def index():
     - If the request method is POST and there are additional questions needed, it renders the 'questions.html' template with the questions and the extracted information.
     - If the request method is GET, it renders the 'index.html' template.
     """
-    if request.method == 'POST':
-        user_input = request.form['user_input']
-        extraction_chain = create_extraction_chain()
-        extracted_info = extract_information(extraction_chain, user_input)
-        # print("Extracted : ", extracted_info) # Uncomment to find the extracted info from the user's draft
-        question_chain = create_question_chain()
-        questions_dict = generate_questions(question_chain, extracted_info)
-        # print("Question : ", questions_dict) # Check the questionaaire created by the llm for incomplete data
+    try:
+        if request.method == 'POST':
+            user_input = request.form['user_input']
+            extraction_chain = create_extraction_chain()
+            extracted_info = extract_information(extraction_chain, user_input)
+            # print("Extracted : ", extracted_info) # Uncomment to find the extracted info from the user's draft
+            question_chain = create_question_chain()
+            # questions_dict = generate_questions(question_chain, extracted_info)
+            questions_dict = json.loads(generate_questions(question_chain, extracted_info))
 
-        if "result" in questions_dict and questions_dict["result"] == "No additional questions needed.":
-            proposal_chain = create_proposal_chain()
-            proposal = generate_proposal(proposal_chain, extracted_info)
-            return render_template('proposal.html', proposal=proposal)
-        else:
-            return render_template('questions.html', questions_dict=questions_dict, extracted_info=extracted_info)
-    return render_template('index.html')
+            print("Question : ", questions_dict) # Check the questionaaire created by the llm for incomplete data
+            
+            if "result" in questions_dict and questions_dict["result"] == "No additional questions needed.":
+                proposal_chain = create_proposal_chain()
+                proposal = generate_proposal(proposal_chain, extracted_info)
+                return render_template('proposal.html', proposal=proposal)
+            else:
+                return render_template('questions.html', questions_dict=questions_dict, extracted_info=extracted_info)
+        return render_template('index.html')
+    except Exception as e:
+            error_message = "Oops, something went wrong. Please try rephrasing your input or providing more information."
+            return render_template('index.html', error_message=error_message)
 
 def generate_questionnaire(input_dict):
     """
@@ -308,7 +381,7 @@ def submit_answers():
     """
     answers = request.form.to_dict()
     _ , extracted_info = generate_questionnaire(answers)
-    # print("info: ",extracted_info) # Check the final extracted info
+    print("info: ",extracted_info) # Check the final extracted info
     proposal_chain = create_proposal_chain()
     proposal = generate_proposal(proposal_chain, extracted_info)
     return render_template('proposal.html', proposal=proposal)

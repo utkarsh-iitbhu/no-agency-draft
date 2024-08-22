@@ -22,6 +22,18 @@
                         <option value="30-45 days">30-45 days</option>
                         <option value="45+ days">45+ days</option>
                     </select>
+                    <!-- {% elif "feature" in key.lower() %} 
+                        
+                        <textarea name="{{ key }}"></textarea> -->
+                        <!-- Correct the code below it is all wrong I wnat options dropdown of list  -->
+                        {% elif "additional features" in key.lower() %}
+                        What additional features would you like to add?
+                        <br>
+                        {% for feature in question %}
+                        <input type="checkbox" name="{{ key }}" value="{{ feature }}">{{ feature }}<br>
+                    
+                    {% endfor %}
+                    
                 {% else %}
                     <input type="text" name="{{ key }}" required>
                 {% endif %}

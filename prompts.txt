@@ -67,3 +67,26 @@ Prompt:
         - Key phases and milestones
         - Resource allocation throughout the project lifecycle
         - Critical path and potential bottlenecks
+
+def create_question_chain():
+    template = """
+    Based on the extracted information, generate questions for any missing or unclear details:
+
+    {extracted_info}
+
+    If the "What are the additional features that you want to add?" field is marked as "Not provided", provide a list of potential additional features that could be relevant based on the provided project details.
+    The list should be in the following format:
+
+    "What additional features would you like to add?":
+    - Feature 1
+    - Feature 2
+    - Feature 3
+    - Feature 4
+    - Feature 5
+
+    If all information is provided, respond with "No additional questions needed."
+
+    Output in JSON format without any markdown formatting.
+    """
+    prompt = ChatPromptTemplate.from_messages([HumanMessagePromptTemplate.from_template(template)])
+    return LLMChain(llm=llm, prompt=prompt)
