@@ -48,6 +48,7 @@ def create_extraction_chain():
         LLMChain: A chain for extracting project information from user input.
     """
     template = """
+    You are a project management expert and you have to extract the following information from the user's input:
     Extract the following information from the user's input. If the information is not present, output "Not provided":
 
     1. What is the project to build?
@@ -70,6 +71,7 @@ def create_extraction_chain():
 
 def create_question_chain():
     template = """
+    You are a project management expert and you have to generate questions based on the extracted information.
     Based on the extracted information, generate questions for any missing or unclear details:
 
     {extracted_info}
@@ -95,6 +97,7 @@ def create_question_chain():
 
 def create_proposal_chain():
     template = """
+    You are a project management expert and you have to create a project proposal based on the provided information.
     Create a highly detailed and comprehensive project proposal based on the following information:
     {all_info}
 
@@ -203,21 +206,6 @@ def generate_questions(chain, extracted_info):
     """
     questions_json = chain.run(extracted_info=extracted_info)
     questions_dict = questions_json
-    # questions_json = chain.run(extracted_info=json.dumps(extracted_info, indent=2))
-    # start_index = questions_json.find('{')
-    # end_index = questions_json.rfind('}')
-    
-    # if start_index == -1 or end_index == -1:
-    #     # If no JSON object is found, generate questions for missing information
-    #     return generate_questions_for_missing_info(extracted_info)
-    
-    # questions_json = questions_json[start_index:end_index+1]
-    # questions_dict = json.loads(questions_json)
-    
-    # # Check if any questions were generated
-    # if all(value is None for value in questions_dict.values()):
-    #     return generate_questions_for_missing_info(extracted_info)
-    
     return questions_dict
 
 def generate_questions_for_missing_info(extracted_info):
@@ -269,10 +257,10 @@ def api_generate_questions():
     '''
     {
     "extracted_info": {
-        "What is the project to build?": "web app",
-        "What are the features to add in the project?": "authentication, dashboard",
+        "What is the project to build?": "Hyper local supermarket place for medical-healthcare industry.",
+        "What are the features to add in the project?": "Buying medicines, booking doctor appointments, authentication for users, authentication for providers, shopping cart, secure payments, reviews, blogs, doctor scheduling",
         "What are the additional features that you want to add?": "Not provided"
-    }
+        }
     }
 
     '''
@@ -287,10 +275,10 @@ def api_generate_proposal():
     '''
     {
     "all_info": {
-        "What is the project to build?": "web app",
-        "What are the features to add in the project?": "authentication, dashboard",
-        "What are the additional features that you want to add?": "notifications, analytics"
-    }
+        "What is the project to build?": "Hyper local supermarket place for medical-healthcare industry.",
+        "What are the features to add in the project?": "Buying medicines, booking doctor appointments, authentication for users, authentication for providers, shopping cart, secure payments, reviews, blogs, doctor scheduling",
+        "What additional features that you want to add?": "- Online chat with doctors - Telemedicine services - Integration with insurance providers - Loyalty programs - Personalized recommendations"
+        }
     }
 
     '''
