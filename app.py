@@ -1,5 +1,6 @@
 import os
 import json
+import pandas as pd
 import warnings
 warnings.filterwarnings('ignore')
 from dotenv import load_dotenv
@@ -13,12 +14,18 @@ import google.generativeai as genai
 # Load environment variables
 load_dotenv()
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+if not GOOGLE_API_KEY:
+    raise EnvironmentError("GOOGLE_API_KEY not found in environment variables")
 genai.configure(api_key=GOOGLE_API_KEY)
+
 
 app = Flask(__name__)
 
 # Initialize the model
-llm = ChatGoogleGenerativeAI(model="gemini-pro",max_output_tokens=18000)
+try:
+    llm = ChatGoogleGenerativeAI(model="gemini-pro", max_output_tokens=30000,temperature=0.001)
+except Exception as e:
+    raise RuntimeError(f"Failed to initialize ChatGoogleGenerativeAI: {e}")
 
 def load_tags():
     """
@@ -30,10 +37,40 @@ def load_tags():
     Returns:
     str: A comma-separated string of tags.
     """
-    with open('tags-database.txt', 'r') as file:
-        return ', '.join(file.read().splitlines())
+    try:
+        with open('tags-database.txt', 'r') as file:
+            tags = file.read().splitlines()
+            if not tags:
+                raise ValueError("The tags-database.txt file is empty")
+            return ', '.join(tags)
+    except FileNotFoundError:
+        raise FileNotFoundError("tags-database.txt file not found")
+    except Exception as e:
+        raise RuntimeError(f"Error loading tags: {e}")
 
 all_tags = load_tags()
+
+# Load and preprocess the CSV file
+def preprocess_csv(csv_file_path):
+    try:
+        df = pd.read_csv(csv_file_path)
+        df = df.dropna(how='all')
+        df = df.fillna('')
+        data = df.to_dict('records')
+        json_data = json.dumps(data)
+        return json_data
+    except FileNotFoundError:
+        return f"Error: The file '{csv_file_path}' was not found."
+    except pd.errors.EmptyDataError:
+        return "Error: The file is empty."
+    except pd.errors.ParserError:
+        return "Error: The file could not be parsed."
+    except Exception as e:
+        return f"An unexpected error occurred: {str(e)}"
+
+# Load the CSV file
+csv_file_path = 'timeline-estimates.csv'
+timeline_data = preprocess_csv(csv_file_path)
 
 def create_extraction_chain():
     """
@@ -104,7 +141,11 @@ def create_proposal_chain():
     Using the provided user input and your expertise in software development and project management, create an extensive project proposal. 
     Follow the structure below, ensuring each section is thoroughly addressed with specific details, examples, and justifications where applicable.
     The features provided by the user are basic so you have to add new complex and multipurpose features which can be around the project 
-        
+    
+    When estimating timelines for features, use the following data as a reference. Adjust your estimates based on the complexity of the requested features and the specific project requirements:
+
+    {timeline_data}
+      
     1. Title: It should be 2-3 words of title
     Provide a catchy and crisp title for the project that reflects its core purpose and unique value proposition.
 
@@ -121,7 +162,7 @@ def create_proposal_chain():
     Select 5-10 most relevant tags from the provided list. Dont select the same tag twice and don't select tags that are not relevant to the project. For each tag, briefly explain its relevance to the project.
     Available Tags: {all_tags}
 
-    6. Major Features and Sub-Features:
+    5. Major Features and Sub-Features:
 
     Provide a comprehensive breakdown of at least 10-12 key features features for the project, representing the user's journey through the application. Apart from the features provided by the user including both common and advanced features relevant to the user's requirements.
     Present the information in a structured format as shown below.
@@ -187,11 +228,18 @@ def extract_information(chain, user_input):
     Returns:
         dict: A dictionary containing the extracted information.
     """
-    extraction_result = chain.run(user_input=user_input)
-    start_index = extraction_result.find('{')
-    end_index = extraction_result.rfind('}')
-    extraction_result = extraction_result[start_index:end_index+1]
-    return json.loads(extraction_result)
+    try:
+        extraction_result = chain.run(user_input=user_input)
+        start_index = extraction_result.find('{')
+        end_index = extraction_result.rfind('}')
+        if start_index == -1 or end_index == -1:
+            raise ValueError("Failed to parse JSON from extraction result")
+        extraction_result = extraction_result[start_index:end_index+1]
+        return json.loads(extraction_result)
+    except json.JSONDecodeError:
+        raise ValueError("Error decoding JSON from the extraction result")
+    except Exception as e:
+        raise RuntimeError(f"Error in extracting information: {e}")
 
 def generate_questions(chain, extracted_info):
     """
@@ -204,9 +252,15 @@ def generate_questions(chain, extracted_info):
     Returns:
         dict: A dictionary of questions or a string indicating no additional questions are needed.
     """
-    questions_json = chain.run(extracted_info=extracted_info)
-    questions_dict = questions_json
-    return questions_dict
+    try:
+        questions_json = chain.run(extracted_info=extracted_info)
+        questions_dict = questions_json
+        return questions_dict
+    except json.JSONDecodeError:
+        raise ValueError("Error decoding JSON from the generated questions")
+    except Exception as e:
+        raise RuntimeError(f"Error in generating questions: {e}")
+   
 
 def generate_questions_for_missing_info(extracted_info):
     """
@@ -235,10 +289,16 @@ def generate_proposal(chain, all_info):
     Returns:
         object: The generated proposal.
     """
-    proposal_json = chain.run(all_info=all_info, all_tags=all_tags)
-    return proposal_json
-    # return chain.run(all_info=all_info, all_tags=all_tags)
-
+    # print("Time : ",timeline_data)
+    try:
+        proposal_json = chain.run(all_info=all_info, all_tags=all_tags,timeline_data=timeline_data)
+        # proposal_json = chain.run(all_info=all_info, all_tags=all_tags,timeline_data=timeline_data)
+        return proposal_json
+    except json.JSONDecodeError:
+        raise ValueError("Error decoding JSON from the generated proposal")
+    except Exception as e:
+        raise RuntimeError(f"Error in generating proposal: {e}")
+    
 @app.route('/api/extract', methods=['POST'])
 def api_extract():
     '''
@@ -247,10 +307,16 @@ def api_extract():
     }
     '''
     data = request.json
+    if not data or 'user_input' not in data:
+        return jsonify({"error": "Invalid input data"}), 400
+
     user_input = data.get('user_input', '')
     extraction_chain = create_extraction_chain()
-    extracted_info = extract_information(extraction_chain, user_input)
-    return jsonify(extracted_info)
+    try:
+        extracted_info = extract_information(extraction_chain, user_input)
+        return jsonify(extracted_info)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/generate_questions', methods=['POST'])
 def api_generate_questions():
@@ -265,10 +331,16 @@ def api_generate_questions():
 
     '''
     data = request.json
+    if not data or 'extracted_info' not in data:
+        return jsonify({"error": "Invalid input data"}), 400
+
     extracted_info = data.get('extracted_info', {})
     question_chain = create_question_chain()
-    questions_dict = generate_questions(question_chain, extracted_info)
-    return jsonify(questions_dict)
+    try:
+        questions_dict = generate_questions(question_chain, extracted_info)
+        return jsonify(questions_dict)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/generate_proposal', methods=['POST'])
 def api_generate_proposal():
@@ -283,10 +355,16 @@ def api_generate_proposal():
 
     '''
     data = request.json
+    if not data or 'all_info' not in data:
+        return jsonify({"error": "Invalid input data"}), 400
+
     all_info = data.get('all_info', {})
     proposal_chain = create_proposal_chain()
-    proposal = generate_proposal(proposal_chain, all_info)
-    return jsonify(proposal)
+    try:
+        proposal = generate_proposal(proposal_chain, all_info)
+        return jsonify(proposal)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # Flask routes
 @app.route('/', methods=['GET', 'POST'])
@@ -314,7 +392,7 @@ def index():
             # questions_dict = generate_questions(question_chain, extracted_info)
             questions_dict = json.loads(generate_questions(question_chain, extracted_info))
 
-            print("Question : ", questions_dict) # Check the questionaaire created by the llm for incomplete data
+            # print("Question : ", questions_dict) # Check the questionaaire created by the llm for incomplete data
             
             if "result" in questions_dict and questions_dict["result"] == "No additional questions needed.":
                 proposal_chain = create_proposal_chain()
@@ -368,11 +446,14 @@ def submit_answers():
         render_template: The proposal HTML template with the generated proposal.
     """
     answers = request.form.to_dict()
-    _ , extracted_info = generate_questionnaire(answers)
-    print("info: ",extracted_info) # Check the final extracted info
-    proposal_chain = create_proposal_chain()
-    proposal = generate_proposal(proposal_chain, extracted_info)
-    return render_template('proposal.html', proposal=proposal)
+    try:
+        _, extracted_info = generate_questionnaire(answers)
+        proposal_chain = create_proposal_chain()
+        proposal = generate_proposal(proposal_chain, extracted_info)
+        return render_template('proposal.html', proposal=proposal)
+    except Exception as e:
+        error_message = f"Error generating proposal: {str(e)}"
+        return render_template('index.html', error_message=error_message)
 
 if __name__ == '__main__':
     app.run(debug=True)

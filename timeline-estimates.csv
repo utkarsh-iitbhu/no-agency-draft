@@ -1,0 +1,86 @@
+Main Feature,Add-on,Expected hours Frontend(UI),Expected Hours Frontend (Integration),Customization(%),Expected hours backend(easy- peak traffic:10k)),Expected hours backend(medium peak traffic-  (10k-50k)),Expected hours backend(high> 50k),Category
+Product catalog page,Numeric pagination,2,1,2,3,5,9,E-Commerce
+,Card component,,1.5,2,0,,,E-Commerce
+,infinite scrolling,,1,2,0,,,E-Commerce
+,Load more button,,0.5,2,0,,,E-Commerce
+"Product detail  page(info,video,variants,seller info others)",Other products of brands,3.5,,5,,,,E-Commerce
+,Review and Rating(text based),,2,,3,5,9,E-Commerce
+,Review and Rating(video based),,2.5,,5,7,9,E-Commerce
+,Report or like review,,1,,1,3,5,E-Commerce
+"Cart system(add, remove,delete,update)",Move to wishlist/save for later,1.5,1,5,5,7,9,E-Commerce
+,order summary,,2,,,0,,E-Commerce
+Checkout process,single discount system,1.5,1,5,3,5,7,E-Commerce
+,Tax and other charge calc,,1,,4,6,8,E-Commerce
+Order system(adding logistics),"Creating order in third party system(shipRocket,others)",1,3,5,2,4,6,E-Commerce
+,Tracking from third party sytem,,3,,4,6,8,E-Commerce
+,My orders,,2,,4,6,8,E-Commerce
+,Refund status,,Mail,,2,4,6,E-Commerce
+,Return system,,Mail,,4,6,8,E-Commerce
+Wishlist,,,1,,2,4,6,E-Commerce
+Login & signup with email password,email verification,2,1,2,2,4,6,General
+,Two factor authentication with email,,1,,1,3,5,General
+Login & signup with email password(role based),email verification,2,1,,2.5,4.5,6.5,General
+,Two factor authentication with email,,1,,1,3,5,General
+Social Login and Social Signup,google,0.5,0.5,,1,3,5,General
+,facebook,0.5,0.5,,1,3,5,General
+,github,0.5,0.5,,1,3,5,General
+,linkedin,0.5,0.5,,1,3,5,General
+,others,0.5,0.5,,1,3,5,General
+Login &Signup with phone,,1.5,1,,2,4,6,General
+Static Page,EASY,4,0.5,5,0,0,0,General
+"Landing Page(5 section with 3D graphics,blender animations)",,6,0.5,5,0,0,0,General
+Searchbar(handled from frontend),,0.5,1,3,0,0,0,General
+Searchbar(handled from backend)[complex],,0.5,0,,5,7,9,General
+Searchbar(handled from backend)[moderate],,0.5,0,,2,4,6,General
+Filter(handled from frontend),,1,1.5,,0,0,2,General
+Filter(handled from backend)[complex],,1,0,,3,5,7,General
+Coupon System,Coupoun Tree( changes condition with user type),1,1,,3,5,7,General
+,Coupon Analytics,1,2,,1,3,5,General
+Payment gateway,Razorpay,1,2,,2,4,6,General
+,Stripe,1,2,,2,4,6,General
+,Paypal,1,2,,2,4,6,General
+,Others,1,2,,2,4,6,General
+About us,,2,0.5,,,,,General
+Contact Us,,2,0.5,,,,,General
+Privacy Policy,,2,0.5,,,,,General
+Terms and conditions,,2,0.5,,,,,General
+FAQ,,1.5,0.5,,2,3,4,General
+My Account,,2,1,,2,3,4,General
+Wallet system,Credit base,3,3,,2,3,4,General
+Refferal based,unique code based,1,3,,2,3,4,General
+,cookies based(link sharing),1,2.5,,2,3,4,General
+Multi Currency support,,0.5,0.5,,2,3,4,General
+Blogs,,2,0.5,,,,,General
+Coming Soon Page,,2,0,,,,,General
+Comments,,1,1,,,,,General
+,,,1.5,,,,,
+,,,,,,,,
+,,,,,,,,
+Content Management,,3,2,2,2,,,
+AI Tool Integrations,,5,3,3,2,,,
+Course Feature,Categories,2,1,1.5,2,,,LMS
+,Course,3,2,2,2,,,LMS
+,Variations (Components),3,2,2,2,,,LMS
+,Reviews,2,1.5,2,2,,,LMS
+,Course Player,4,3,3,3,,,LMS
+,Course Details,2,1.5,2,2,,,LMS
+User Dashboard,My Profile,2,1,1.5,2,,,LMS
+,Favorite Courses,2,1,1.5,2,,,LMS
+,Registered Course,3,2,2,2,,,LMS
+,Payment History,2,1.5,2,2,,,LMS
+,My Account,2,1.5,2,2,,,LMS
+,Payment Account,3,2,2.5,2.5,,,LMS
+Chat,AI Chat Bot,5,3,3.5,5,,,
+,Two Chat,3,2,2.5,5,,,
+,Group Chat,4,3,3,5,,,
+,Multimedia Support,3,2.5,3,3,,,
+,Voice Call,4,3,3.5,5,,,
+,Video Call,5,3.5,3.5,5,,,
+Escrow Service,,4,3,3.5,5,,,
+Seller Profile,,6,2.5,2.5,5,,,
+Gig/Product Catalogue Management,,4,3,3.5,4,,,
+Seller Profile,,4,3,6,8,,,General
+Gig/Product catalouge management,,5,3.5,7,8.5,,,General
+Job application feed,,4,3.7,7.4,8.9,,,General
+Job application process management,,4,4.5,9,10,,,General
+Fall back screens,,1,0,0,0,,,General
